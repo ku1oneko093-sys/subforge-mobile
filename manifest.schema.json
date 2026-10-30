@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SubForge Mobile Library v1",
+  "description": "ZIP root SubForge-Mobile-Library/. Runtime also validates safe relative paths, unique IDs, extensions, sizes, CRC and SHA-256. Files indexed here are media; per-work metadata JSON is supplementary.",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "mode",
+    "works",
+    "files",
+    "work_count"
+  ],
+  "properties": {
+    "format": {
+      "const": "subforge-mobile"
+    },
+    "version": {
+      "const": 1
+    },
+    "mode": {
+      "enum": [
+        "full",
+        "incremental",
+        "subtitles"
+      ]
+    },
+    "work_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "works": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "$ref": "#/$defs/work"
+      }
+    },
+    "files": {
+      "type": "object",
+      "maxProperties": 100000,
+      "additionalProperties": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/asset"
+          },
+          {
+            "type": "object",
+            "required": [
+              "included"
+            ],
+            "properties": {
+              "included": {
+                "type": "boolean"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "size",
+        "type"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^works/"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 53687091200
+        },
+        "type": {
+          "enum": [
+            "audio",
+            "subtitle",
+            "cover"
+          ]
+        }
+      }
+    },
+    "track": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "order",
+        "duration",
+        "audio",
+        "ja",
+        "zh"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "order": {
+          "type": "number"
+        },
+        "duration": {
+          "type": "number",
+          "minimum": 0
+        },
+        "audio": {
+          "$ref": "#/$defs/asset"
+        },
+        "ja": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/asset"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "zh": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/asset"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "work": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "rj",
+        "circle",
+        "voices",
+        "tags",
+        "cover",
+        "tracks",
+        "metadata"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "rj": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "cover": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/asset"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "metadata": {
+          "type": "string"
+        },
+        "tracks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/track"
+          }
+        },
+        "circle": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "voices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+    }
+  }
+}
